@@ -1,0 +1,100 @@
+{
+  "destinations": [
+    {
+      "day": "2024-12-15",
+      "coordinates": {
+        "lat": 37.9667,
+        "lon": 23.5167
+      },
+      "destination": "Athens",
+      "distanceNM": 0,
+      "duration": "00:00",
+      "comfortLevel": "Comfortable Starting Point",
+      "safety": "Good weather conditions, low wave height."
+    },
+    {
+      "day": "2024-12-16",
+      "coordinates": {
+        "lat": 37.9667,
+        "lon": 23.5167
+      },
+      "destination": "Piraeus",
+      "distanceNM": 7,
+      "duration": "01:00",
+      "comfortLevel": "Comfortable Sailing",
+      "safety": "Good weather conditions, low wave height."
+    },
+    {
+      "day": "2024-12-17",
+      "coordinates": {
+        "lat": 37.4456,
+        "lon": 24.9333
+      },
+      "destination": "Kea",
+      "distanceNM": 38,
+      "duration": "06:30",
+      "comfortLevel": "Comfortable Sailing",
+      "safety": "Moderate wind and low wave height, suitable for intermediate level."
+    },
+    {
+      "day": "2024-12-18",
+      "coordinates": {
+        "lat": 37.36675,
+        "lon": 25.2464
+      },
+      "destination": "Syros",
+      "distanceNM": 35,
+      "duration": "06:00",
+      "comfortLevel": "Moderate Sailing",
+      "safety": "Low wind speed with minimal waves, safe for the trip."
+    },
+    {
+      "day": "2024-12-19",
+      "coordinates": {
+        "lat": 37.7329,
+        "lon": 23.4806
+      },
+      "destination": "Poros",
+      "distanceNM": 61,
+      "duration": "10:30",
+      "comfortLevel": "Moderate Sailing",
+      "safety": "Increasing wind speed, but waves remain low, manageable for experienced crew."
+    },
+    {
+      "day": "2024-12-20",
+      "coordinates": {
+        "lat": 37.8500,
+        "lon": 23.6833
+      },
+      "destination": "Lavrio",
+      "distanceNM": 23,
+      "duration": "03:50",
+      "comfortLevel": "Comfortable Sailing",
+      "safety": "Gentle breeze and low wave height expected."
+    },
+    {
+      "day": "2024-12-21",
+      "coordinates": {
+        "lat": 36.7183,
+        "lon": 23.3886
+      },
+      "destination": "Monemvasia",
+      "distanceNM": 85,
+      "duration": "14:00",
+      "comfortLevel": "Challenging Sailing",
+      "safety": "Moderate wind and high wave height; proceed with caution due to potential rough waters."
+    },
+    {
+      "day": "2024-12-22",
+      "coordinates": {
+        "lat": 36.4743,
+        "lon": 22.5086
+      },
+      "destination": "Gythio",
+      "distanceNM": 46,
+      "duration": "08:00",
+      "comfortLevel": "Moderate Sailing",
+      "safety": "Wind and waves expected to be moderate; suitable for intermediate level."
+    }
+  ]
+}

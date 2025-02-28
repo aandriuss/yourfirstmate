@@ -100,6 +100,20 @@ export function NavBar({ scroll = false }: NavBarProps) {
             </div>
           ) : null}
 
+            <Link
+              href="/main"
+              className="hidden md:block"
+            >
+              <Button
+                className="gap-2 px-5"
+                variant="default"
+                size="sm"
+                rounded="full"
+              >
+                <span>Plan Trip</span>
+              </Button>
+            </Link> 
+
           {session ? (
             <Link
               href={session.user.role === "ADMIN" ? "/admin" : "/dashboard"}
