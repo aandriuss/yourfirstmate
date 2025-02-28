@@ -100,3 +100,67 @@ export type TestimonialType = {
   image: string;
   review: string;
 };
+
+import { RefObject } from 'react';
+
+export interface Destination {
+  id: string;
+  name: string;
+  distance?: number;
+  comfortLevel?: 'High' | 'Medium' | 'Low';
+  time?: string;
+  coordinates: {
+    lat: number;
+    lon: number;
+  };
+  image?: string;
+  rating?: number;
+  description?: string;
+  distanceNM?: number;
+  sailingHours?: number;
+  day?: number;
+}
+
+export interface TripDestination extends Destination {}
+
+export interface SailingDestination {
+  day: string;
+  coordinates: {
+    lat: number;
+    lon: number;
+  };
+  destination: string;
+  distanceNM: number;
+  duration: string;
+  comfortLevel: string;
+  safety: string;
+}
+
+export interface Port {
+  port: string;
+  coordinates: {
+    lat: number;
+    lon: number;
+  };
+  top: string;
+  comfortScore: string;
+}
+
+export interface SavedTrip {
+  id: string;
+  name: string;
+  destinations: SailingDestination[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TripPanelProps {
+  isOpen: boolean;
+  isEditMode: boolean;
+  onClose: () => void;
+  onTripStart: (coordinates: { lat: number; lon: number }) => void;
+  portsData: Port[];
+  mapRef: RefObject<mapboxgl.Map>;
+  isPanelMinimized: boolean;
+  onMinimizeChange: (minimized: boolean) => void;
+}
