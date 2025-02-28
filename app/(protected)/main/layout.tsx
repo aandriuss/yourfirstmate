@@ -1,7 +1,6 @@
 import { getCurrentUser } from "@/lib/session";
 import { constructMetadata } from "@/lib/utils";
 import { TripProvider } from "@/context/trip-context";
-// Import other providers as needed
 
 export const metadata = constructMetadata({
   title: "Plan Your Trip",
@@ -18,7 +17,6 @@ export default async function MainLayout({ children }: MainLayoutProps) {
   
   return (
     <TripProvider>
-      {/* Add other providers here if needed */}
       {children}
     </TripProvider>
   );

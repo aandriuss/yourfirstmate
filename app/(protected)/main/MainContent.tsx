@@ -44,7 +44,7 @@ export default function MainContent() {
   };
 
   return (
-    <div className="fixed inset-0 h-screen w-screen overflow-hidden">
+    <div className="fixed inset-0 top-14 h-[calc(100vh-3.5rem)] w-screen overflow-hidden">
       {/* Map Container Component */}
       <MapContainer 
         ref={mapRef}
