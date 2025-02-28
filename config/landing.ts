@@ -2,51 +2,51 @@ import { FeatureLdg, InfoLdg, TestimonialType } from "types";
 
 export const infos: InfoLdg[] = [
   {
-    title: "Empower your projects",
+    title: "Navigate with Confidence",
     description:
-      "Unlock the full potential of your projects with our open-source SaaS platform. Collaborate seamlessly, innovate effortlessly, and scale limitlessly.",
-    image: "/_static/illustrations/work-from-home.jpg",
+      "Discover the ultimate sailing companion with our app. Plan your routes, track your journey, and stay informed with real-time weather updates.",
+    image: "/_static/illustrations/sailing.jpg",
     list: [
       {
-        title: "Collaborative",
-        description: "Work together with your team members in real-time.",
-        icon: "laptop",
+        title: "Route Planning",
+        description: "Easily plan and customize your sailing routes.",
+        icon: "map",
       },
       {
-        title: "Innovative",
-        description: "Stay ahead of the curve with access constant updates.",
-        icon: "settings",
+        title: "Journey Tracking",
+        description: "Keep track of your journey with detailed logs.",
+        icon: "compass",
       },
       {
-        title: "Scalable",
+        title: "Weather Updates",
         description:
-          "Our platform offers the scalability needed to adapt to your needs.",
-        icon: "search",
+          "Stay ahead of the weather with real-time updates and alerts.",
+        icon: "cloud",
       },
     ],
   },
   {
     title: "Seamless Integration",
     description:
-      "Integrate our open-source SaaS seamlessly into your existing workflows. Effortlessly connect with your favorite tools and services for a streamlined experience.",
-    image: "/_static/illustrations/work-from-home.jpg",
+      "Integrate our sailing app seamlessly into your sailing adventures. Connect with your favorite marine tools and services for a streamlined experience.",
+    image: "/_static/illustrations/sailing.jpg",
     list: [
       {
         title: "Flexible",
         description:
-          "Customize your integrations to fit your unique requirements.",
-        icon: "laptop",
+          "Customize your app settings to fit your unique sailing needs.",
+        icon: "settings",
       },
       {
         title: "Efficient",
-        description: "Streamline your processes and reducing manual effort.",
-        icon: "search",
+        description: "Optimize your sailing experience with our app.",
+        icon: "speedometer",
       },
       {
         title: "Reliable",
         description:
-          "Rely on our robust infrastructure and comprehensive documentation.",
-        icon: "settings",
+          "Depend on our app's robust features and comprehensive support.",
+        icon: "anchor",
       },
     ],
   },
