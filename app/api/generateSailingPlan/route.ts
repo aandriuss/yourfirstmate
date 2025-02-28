@@ -1,18 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY // Ensure this is set in your environment
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY 
 });
 
-/**
- * Generates a sailing trip plan using the OpenAI API.
- * @param location - The port selected by the user.
- * @param localtime - The local time at the location.
- * @returns A promise that resolves to the trip plan.
- */
-
 export const config = {
+  runtime: 'edge',
   maxDuration: 60
 };
 
@@ -38,12 +32,9 @@ const DEFAULT_SYSTEM_PROMPT = `
         The one day distance should be not more than 28 nautical miles.
         Additionally, provide a list of ports from that region not further than 50NM. Make it a separate object in reply, call it "extendedPorts".`;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method === 'POST') {
-    const { location, localtime, customPrompt } = req.body;
+export async function POST(request: NextRequest) {
+  try {
+    const { location, localtime, customPrompt } = await request.json();
 
     const messages: { role: 'system' | 'user'; content: string }[] = [
       {
@@ -126,21 +117,19 @@ export default async function handler(
       }
     ];
 
-    try {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: messages,
-        temperature: 1,
-        max_tokens: 8000
-      });
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: messages,
+      temperature: 1,
+      max_tokens: 8000
+    });
 
-      res.status(200).json({ content: response.choices[0].message.content });
-    } catch (error) {
-      console.error('Error generating sailing plan:', error);
-      res.status(500).json({ error: 'Failed to generate sailing plan' });
-    }
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    return NextResponse.json({ content: response.choices[0].message.content });
+  } catch (error) {
+    console.error('Error generating sailing plan:', error);
+    return NextResponse.json(
+      { error: 'Failed to generate sailing plan' },
+      { status: 500 }
+    );
   }
 }

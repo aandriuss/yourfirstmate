@@ -157,7 +157,6 @@ export const useSailingPlan = (
       (dest) => !currentDestinations.has(dest.destination)
     );
 
-    // Combine all available destinations
     // Combine and deduplicate all available destinations
     const allDestinations = Array.from(
       new Map(
