@@ -55,8 +55,10 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
             classNames={{
               tabList: 'gap-6',
               cursor: 'w-full bg-primary',
-              tab: 'max-w-fit px-2 h-12',
-              tabContent: 'group-data-[selected=true]:text-primary'
+              tab: 'max-w-fit px-2 h-12 data-[disabled=true]:opacity-40 data-[disabled=true]:cursor-not-allowed',
+              tabContent: 'text-default-500 data-[selected=true]:text-primary',
+              base: "w-full",
+              wrapper: "border-b-2 data-[selected=true]:border-primary"
             }}
             selectedKey={tripPanelHook.activeTab}
             variant="underlined"
@@ -64,20 +66,29 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
               tripPanelHook.setActiveTab(key.toString())
             }
           >
-            <Tab key="start" title="Start" />
+            <Tab 
+              key="start" 
+              title="Start"
+              className="px-4 py-2 text-sm"
+            />
             <Tab
               key="trip"
               isDisabled={tripPanelHook.selectedDestinations.length === 0}
               title="Trip"
+              className="px-4 py-2 text-sm"
             />
-            <Tab key="saved" title="Saved Trips" />
+            <Tab 
+              key="saved" 
+              title="Saved Trips"
+              className="px-4 py-2 text-sm"
+            />
           </Tabs>
 
           {tripPanelHook.selectedDestinations.length > 0 && (
             <Button
               color="primary"
               size="sm"
-              onClick={() => tripPanelHook.setIsSaveModalOpen(true)}
+              onPress={() => tripPanelHook.setIsSaveModalOpen(true)}
             >
               Save Trip
             </Button>
@@ -118,7 +129,7 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
               />
               {tripPanelHook.showDestinationSuggestions &&
                 tripPanelHook.tripSearchQuery && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1">
+                  <div className="absolute inset-x-0 top-full z-50 mt-1">
                     <div className="bg-content1 rounded-lg shadow-lg">
                       <Listbox
                         aria-label="Available destinations"
@@ -151,7 +162,7 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
                 isIconOnly
                 size="sm"
                 variant="light"
-                onClick={() =>
+                onPress={() =>
                   tripPanelHook.setIsListView(!tripPanelHook.isListView)
                 }
               >
@@ -217,8 +228,7 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
                         color="primary"
                         size="sm"
                         variant="light"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onPress={() => {
                           tripPanelHook.handleLoadSavedTrip(trip);
                         }}
                       >
@@ -229,12 +239,11 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
                         color="danger"
                         size="sm"
                         variant="light"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onPress={() => {
                           tripPanelHook.handleDeleteTrip(trip.id);
                         }}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="size-4" />
                       </Button>
                     </div>
                   </div>

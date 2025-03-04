@@ -1,7 +1,10 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Icons } from "@/components/shared/icons";
-import { ChevronUp, ChevronDown } from "lucide-react"; // Import the missing icons
+import { ChevronUp, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { useTripPanel } from './hooks/useTripPanel';
 import { TripPanelContent } from './components/TripPanelContent';
@@ -19,10 +22,9 @@ const MIN_WIDTH = 300;
 const MAX_WIDTH = 800;
 const NAVBAR_HEIGHT = {
   MOBILE: '3.5rem', // 56px
-  DESKTOP: '4rem' // 64px
+  DESKTOP: '3.5rem' // 64px
 };
 
-// Define ref interface
 export interface TripPanelHandle {
   getCurrentDestinations: () => SailingDestination[];
 }
@@ -79,44 +81,37 @@ export const TripPanel = forwardRef<TripPanelHandle, TripPanelProps>(
           <div className="fixed left-0 top-1/2 z-50 -translate-y-1/2">
             {isPanelMinimized ? (
               <Button
-                className="h-32 rounded-l-none rounded-r-lg bg-background/80 shadow-lg backdrop-blur-md"
+                variant="secondary"
+                className={cn(buttonVariants({ variant: "secondary" }), "h-32 rounded-l-none rounded-r-lg shadow-lg")}
                 onClick={() => onMinimizeChange(false)}
               >
-                <Icons.chevronRight className="h-6 w-6" />
+                <Icons.chevronRight className="size-6" />
               </Button>
             ) : (
               <Button
-                className="h-32 rounded-l-none rounded-r-lg bg-background/80 shadow-lg backdrop-blur-md"
+                variant="secondary"
+                className={cn(buttonVariants({ variant: "secondary" }), "h-32 rounded-l-none rounded-r-lg shadow-lg")}
                 style={{ marginLeft: `${width}px` }}
                 onClick={() => onMinimizeChange(true)}
               >
-                <Icons.chevronLeft className="h-6 w-6" />
+                <Icons.chevronLeft className="size-6" />
               </Button>
             )}
           </div>
         )}
-
-        {/* Mobile Minimize Button when panel is minimized */}
-        {isPanelMinimized && isMobile && (
-          <Button
-            className="fixed bottom-6 right-4 z-[200] bg-background/80 shadow-lg backdrop-blur-md"
-            onClick={() => onMinimizeChange(false)}
-          >
-            <ChevronUp className="h-6 w-6" />
-          </Button>
-        )}
-
+    
         {/* Main Panel Content */}
         {!isPanelMinimized && (
           <>
             <div
               ref={panelRef}
-              className={`fixed z-[60] border-gray-200 bg-white shadow-lg transition-all duration-300 dark:border-gray-700 dark:bg-gray-800
-                ${
-                  isMobile
-                    ? 'inset-x-0 top-14 border-t pb-20'
-                    : 'left-0 top-14 border-r md:top-16'
-                }`}
+              className={cn(
+                "fixed z-[60] bg-card text-card-foreground shadow-lg transition-all duration-300",
+                "border-border",
+                isMobile
+                  ? "inset-x-0 top-14 border-t pb-20"
+                  : "left-0 top-14 border-r md:top-14"
+              )}
               style={{
                 width: isMobile ? '100%' : `${width}px`,
                 height: isMobile
@@ -134,17 +129,21 @@ export const TripPanel = forwardRef<TripPanelHandle, TripPanelProps>(
 
               {!isMobile && (
                 <Button
-                  className="absolute right-2 top-2 z-[200] bg-background/80 backdrop-blur-md"
+                  variant="ghost"
+                  size="icon"
+                  className={cn(buttonVariants({ variant: "ghost" }), "absolute right-2 top-2 z-[200]")}
                   onClick={() => tripPanelHook.handleClose()}
                 >
-                  <Icons.close className="h-5 w-5" />
+                  <Icons.close className="size-5" />
                 </Button>
               )}
-              <TripPanelContent
-                isAuthenticated={isAuthenticated}
-                portsData={portsData}
-                tripPanelHook={tripPanelHook}
-              />
+              <ScrollArea className="h-full">
+                <TripPanelContent
+                  isAuthenticated={isAuthenticated}
+                  portsData={portsData}
+                  tripPanelHook={tripPanelHook}
+                />
+              </ScrollArea>
             </div>
 
             {/* Modals - Outside the panel container */}
@@ -176,16 +175,20 @@ export const TripPanel = forwardRef<TripPanelHandle, TripPanelProps>(
         {!isPanelMinimized && isMobile && (
           <>
             <Button
-              className="fixed bottom-6 left-4 z-[200] bg-background/80 shadow-lg backdrop-blur-md"
+              variant="secondary"
+              size="icon"
+              className={cn(buttonVariants({ variant: "secondary" }), "fixed bottom-6 left-4 z-[200] shadow-lg")}
               onClick={() => tripPanelHook.handleClose()}
             >
-              <Icons.close className="h-6 w-6" />
+              <Icons.close className="size-6" />
             </Button>
             <Button
-              className="fixed bottom-6 right-4 z-[200] bg-background/80 shadow-lg backdrop-blur-md"
+              variant="secondary"
+              size="icon"
+              className={cn(buttonVariants({ variant: "secondary" }), "fixed bottom-6 right-4 z-[200] shadow-lg")}
               onClick={() => onMinimizeChange(true)}
             >
-              <ChevronDown className="h-6 w-6" />
+              <ChevronDown className="size-6" />
             </Button>
           </>
         )}
