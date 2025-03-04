@@ -30,13 +30,13 @@ export function PlanTripModal({ isOpen, onClose }: PlanTripModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] p-0">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-semibold mb-1">New trip</h2>
+      <DialogContent className="p-0 sm:max-w-[500px]">
+        <div className="border-b p-6">
+          <h2 className="mb-1 text-xl font-semibold">New trip</h2>
           <p className="text-sm text-muted-foreground">You can change these details at any time.</p>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="space-y-4 p-6">
           {/* AI Trip Planner Switch with gradient */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
@@ -51,13 +51,13 @@ export function PlanTripModal({ isOpen, onClose }: PlanTripModalProps) {
 
           {/* Informational block - positioned under the switcher */}
           {aiEnabled ? (
-            <div className="rounded-md border border-[#6366f1] p-3 bg-[#6366f1]/5">
+            <div className="rounded-md border border-[#6366f1] bg-[#6366f1]/5 p-3">
               <p className="text-xs text-[#6366f1]">
-                AI mode: We'll analyze weather patterns, sailing conditions, and your experience level to suggest the optimal route.
+                AI mode: We&apos;ll analyze weather patterns, sailing conditions, and your experience level to suggest the optimal route.
               </p>
             </div>
           ) : (
-            <div className="rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-3">
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/50">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Manual mode: Add your destinations one by one to create a custom journey with multiple stops.
               </p>
@@ -68,7 +68,7 @@ export function PlanTripModal({ isOpen, onClose }: PlanTripModalProps) {
           <div className="space-y-2">
             <label className="text-sm font-medium">Where are you going?</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input 
                 placeholder="Search for a destination" 
                 className="pl-9"
@@ -82,7 +82,7 @@ export function PlanTripModal({ isOpen, onClose }: PlanTripModalProps) {
           {!aiEnabled && (
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" className="flex items-center">
-                <MapPin className="mr-2 h-4 w-4" />
+                <MapPin className="mr-2 size-4" />
                 Add stop
               </Button>
             </div>
@@ -98,7 +98,7 @@ export function PlanTripModal({ isOpen, onClose }: PlanTripModalProps) {
                   variant="outline"
                   className={cn(
                     "cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20",
-                    selectedLevel === level.id && "bg-blue-100 dark:bg-blue-900/30 border-blue-500"
+                    selectedLevel === level.id && "border-blue-500 bg-blue-100 dark:bg-blue-900/30"
                   )}
                   onClick={() => setSelectedLevel(level.id)}
                 >
@@ -109,7 +109,7 @@ export function PlanTripModal({ isOpen, onClose }: PlanTripModalProps) {
           </div>
 
           {/* Create Trip Button */}
-          <div className="pt-4 border-t">
+          <div className="border-t pt-4">
             <Button 
               className="w-full" 
               size="lg"
