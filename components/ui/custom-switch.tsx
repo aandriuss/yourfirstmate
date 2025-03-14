@@ -1,27 +1,28 @@
-import { Switch } from "@/components/ui/switch";
+"use client";
+
+import * as React from "react";
+import * as SwitchPrimitives from "@radix-ui/react-switch";
 import { cn } from "@/lib/utils";
 
-interface CustomSwitchProps {
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-}
-
-export function CustomSwitch({ checked, onCheckedChange }: CustomSwitchProps) {
-  return (
-    <Switch
-      checked={checked}
-      onCheckedChange={onCheckedChange}
+const CustomSwitch = React.forwardRef<
+  React.ElementRef<typeof SwitchPrimitives.Root>,
+  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
+>(({ className, ...props }, ref) => (
+  <SwitchPrimitives.Root
+    className={cn(
+      "peer inline-flex h-5 w-10 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[#6366f1] data-[state=checked]:to-[#a855f7] data-[state=unchecked]:bg-input",
+      className
+    )}
+    {...props}
+    ref={ref}
+  >
+    <SwitchPrimitives.Thumb
       className={cn(
-        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-        checked ? "bg-blue-600" : "bg-gray-200"
+        "pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
       )}
-    >
-      <span
-        className={cn(
-          "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-          checked ? "translate-x-6" : "translate-x-1"
-        )}
-      />
-    </Switch>
-  );
-}
+    />
+  </SwitchPrimitives.Root>
+));
+CustomSwitch.displayName = SwitchPrimitives.Root.displayName;
+
+export { CustomSwitch }; 
