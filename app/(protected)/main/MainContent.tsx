@@ -6,7 +6,6 @@ import TripPanel from '@/components/trip-panel';
 import MapContainer from '@/components/map/MapContainer';
 import { useMap } from '@/context/map-context';
 import portsData from '@/mock/ports_data.json';
-import mapboxgl from 'mapbox-gl';
 
 export default function MainContent() {
   const { mapRef, isEditMode, toggleEditMode, isActive, setActive, setMapCenter } = useMap();

@@ -49,7 +49,7 @@ export default function IndexPage() {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <nav className="container flex h-14 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold inline-block">YourFirstMate</span>
+            <span className="inline-block font-bold">YourFirstMate</span>
           </Link>
 
           <div className="flex items-center gap-6">
