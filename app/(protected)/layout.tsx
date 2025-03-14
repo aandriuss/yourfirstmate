@@ -10,6 +10,9 @@ import {
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { UserAccountNav } from "@/components/layout/user-account-nav";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
+import Link from "next/dist/client/link";
+import { Icons } from "@/components/shared/icons";
+import { siteConfig } from "@/config/site";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -33,16 +36,23 @@ export default async function Dashboard({ children }: ProtectedLayoutProps) {
 
       <div className="flex flex-1 flex-col">
         <header className="sticky top-0 z-50 flex h-14 bg-background px-4 lg:h-[60px] xl:px-8">
-          <MaxWidthWrapper className="flex max-w-7xl items-center gap-x-3 px-0">
             <MobileSheetSidebar links={filteredLinks} />
 
-            <div className="w-full flex-1">
-              <SearchCommand links={filteredLinks} />
+            <div className="flex items-center space-x-1.5">
+              <Link href="/" className="flex items-center space-x-1.5">
+                <Icons.logo />
+                <span className="font-urban text-xl font-bold">
+                  {siteConfig.name}
+                </span>
+              </Link>
             </div>
 
-            <ModeToggle />
-            <UserAccountNav />
-          </MaxWidthWrapper>
+            <MobileSheetSidebar links={filteredLinks} />
+
+            <div className="ml-auto flex items-center space-x-3">
+              <ModeToggle />
+              <UserAccountNav />
+            </div>
         </header>
 
         <main className="flex-1 p-4 xl:px-8">

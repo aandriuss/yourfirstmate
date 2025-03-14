@@ -25,6 +25,20 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't resolve 'fs', 'net', 'tls' modules on the client side
+      config.resolve.fallback = {
+        fs: false,
+        net: false,
+        tls: false,
+        pg: false,
+        'pg-native': false,
+        'pg-connection-string': false,
+      };
+    }
+    return config;
+  },
 };
 
 module.exports = withContentlayer(nextConfig);
