@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSession } from 'next-auth/react';
 import {
   Input,
   Listbox,
@@ -10,12 +11,14 @@ import {
 import { List, LayoutGrid, Trash2 } from 'lucide-react';
 
 import { useTripPanel } from '../hooks/useTripPanel';
+import { SavedTrip } from '@/types';
 
 import { InitialPlacesList } from './InitialPlacesList';
 import { DestinationCard } from './DestinationCard';
 import DraggableListView from './DraggableListView';
 
 import { Port } from '@/types';
+import { saveTripsToNeon } from '../api/savedTripsApi';
 
 interface TripPanelContentProps {
   isAuthenticated: boolean;
@@ -28,6 +31,8 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
   tripPanelHook,
   portsData
 }) => {
+  const { data: session } = useSession();
+
   const topRatedPorts = portsData
     .filter((port) => port.top !== '')
     .sort((a, b) => Number(a.top) - Number(b.top));
@@ -39,6 +44,26 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
       </div>
     );
   }
+
+  const handleTripUpdate = async (updatedTrip: SavedTrip) => {
+    if (!session?.user?.id) return;
+    
+    // Find the trip in the list and update it
+    const updatedTrips = tripPanelHook.savedTrips.map(trip => 
+      trip.id === updatedTrip.id ? updatedTrip : trip
+    );
+    
+    // Save to local storage using the available method
+    tripPanelHook.handleSaveTrip(updatedTrip.name);
+    
+    // Save to Neon
+    try {
+      await saveTripsToNeon(session.user.id, updatedTrips);
+      console.log('Trips saved successfully after update');
+    } catch (error) {
+      console.error('Failed to save updated trips:', error);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col">
