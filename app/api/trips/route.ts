@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import { db } from '@/lib/db';
+import { auth } from '@/auth';
+import { prisma } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -13,8 +12,12 @@ export async function GET(req: NextRequest) {
     
     const userId = session.user.id;
     
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID not found' }, { status: 400 });
+    }
+    
     // Get trips from database
-    const trips = await db.trip.findMany({
+    const trips = await prisma.trip.findMany({
       where: {
         userId: userId,
       },
@@ -40,7 +43,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     
     if (!session?.user) {
       console.log('No session or user found');
@@ -48,6 +51,11 @@ export async function POST(req: NextRequest) {
     }
     
     const userId = session.user.id;
+    
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID not found' }, { status: 400 });
+    }
+    
     const body = await req.json();
     console.log('Received request body:', body);
     
@@ -60,7 +68,7 @@ export async function POST(req: NextRequest) {
     
     console.log(`Deleting existing trips for user ${userId}`);
     // Delete existing trips for this user
-    await db.trip.deleteMany({
+    await prisma.trip.deleteMany({
       where: {
         userId: userId,
       },
@@ -70,7 +78,7 @@ export async function POST(req: NextRequest) {
     // Insert new trips
     for (const trip of trips) {
       console.log(`Creating trip: ${trip.id} - ${trip.name}`);
-      await db.trip.create({
+      await prisma.trip.create({
         data: {
           id: trip.id,
           name: trip.name,

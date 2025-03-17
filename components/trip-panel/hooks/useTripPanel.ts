@@ -1,4 +1,4 @@
-import { useState, useEffect, RefObject } from 'react';
+import { useState, useEffect, useCallback, RefObject } from 'react';
 
 import { recalculateDistances } from '../utils/distanceUtils';
 import {
@@ -18,6 +18,8 @@ import {
   areDestinationsEqual
 } from '@/utils/storageUtils';
 import { Port, SailingDestination, SavedTrip } from '@/types';
+import { saveTripsToNeon, loadTripsFromNeon } from '../api/savedTripsApi';
+import { useSession } from 'next-auth/react';
 
 export interface UseTripPanelProps {
   mapRef: RefObject<mapboxgl.Map>;
@@ -62,6 +64,11 @@ export const useTripPanel = ({
 
   const [routeEditor, setRouteEditor] = useState<RouteEditor | null>(null);
 
+  const [apiError, setApiError] = useState<string | null>(null);
+  const { data: session } = useSession();
+
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (mapRef.current && !routeEditor) {
       const editor = new RouteEditor({
@@ -98,10 +105,38 @@ export const useTripPanel = ({
     };
   }, []);
 
-  // Load saved trips on mount
+  // Load trips from Neon DB when component mounts
   useEffect(() => {
-    setSavedTrips(getTrips());
-  }, []);
+    if (session?.user?.id) {
+      setIsLoading(true);
+      loadTripsFromNeon(session.user.id)
+        .then((tripsFromNeon) => {
+          console.log('Loaded trips from Neon:', tripsFromNeon);
+          if (tripsFromNeon && tripsFromNeon.length > 0) {
+            // Replace local trips with ones from server
+            setSavedTrips(tripsFromNeon);
+            
+            // Also update localStorage to keep them in sync
+            tripsFromNeon.forEach(trip => {
+              saveTrip(trip);
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to load trips from Neon:', error);
+          // Fallback to local trips
+          const localTrips = getTrips();
+          setSavedTrips(localTrips);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      // Not authenticated, just use local storage
+      const localTrips = getTrips();
+      setSavedTrips(localTrips);
+    }
+  }, [session?.user?.id]);
 
   // Auto-switch to trip tab when destinations are added
   useEffect(() => {
@@ -246,6 +281,23 @@ export const useTripPanel = ({
       sailingPlanHook.setSelectedDestinations([]);
       clearMap();
     }
+    
+    // Delete from Neon if user is authenticated
+    if (session?.user?.id) {
+      try {
+        saveTripsToNeon(session.user.id, updatedTrips)
+          .then(() => {
+            console.log('Trip deleted successfully from Neon');
+          })
+          .catch((error) => {
+            console.error('Failed to delete trip from Neon:', error);
+            setApiError('Failed to delete trip from database. Trip was deleted locally.');
+          });
+      } catch (error) {
+        console.error('Failed to delete trip from Neon:', error);
+        setApiError('Failed to delete trip from database. Trip was deleted locally.');
+      }
+    }
   };
 
   const hasUnsavedChanges = () => {
@@ -267,12 +319,29 @@ export const useTripPanel = ({
       updatedAt: new Date().toISOString()
     };
 
+    // Save to localStorage
     const updatedTrips = saveTrip(tripData);
-
     setSavedTrips(updatedTrips);
     setCurrentTripId(tripData.id);
     setLastSavedDestinations([...sailingPlanHook.selectedDestinations]);
     setShowUnsavedChangesModal(false);
+    
+    // Save to Neon if user is authenticated
+    if (session?.user?.id) {
+      try {
+        saveTripsToNeon(session.user.id, updatedTrips)
+          .then(() => {
+            console.log('Trips saved successfully to Neon');
+          })
+          .catch((error) => {
+            console.error('Failed to save trips to Neon:', error);
+            setApiError('Failed to save trips to database. Your trip is saved locally.');
+          });
+      } catch (error) {
+        console.error('Failed to save trips to Neon:', error);
+        setApiError('Failed to save trips to database. Your trip is saved locally.');
+      }
+    }
   };
 
   const handleClose = () => {
@@ -316,6 +385,8 @@ export const useTripPanel = ({
     currentTripId,
     activeTab,
     setActiveTab,
+    apiError,
+    isLoading,
     handleSaveTrip,
     handleLoadSavedTrip,
     handleDeleteTrip,
