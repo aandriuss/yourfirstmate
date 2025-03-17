@@ -41,25 +41,55 @@ export const SaveTripModal: React.FC<SaveTripModalProps> = ({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalContent>
-        <ModalHeader>{isUpdate ? 'Update Trip' : 'Save New Trip'}</ModalHeader>
-        <ModalBody>
+    <div 
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur"
+      onClick={(e) => {
+        // Only close if clicked directly on the backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        className="min-w-96 max-w-md rounded-lg bg-background shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="border-b px-6 pb-4 pt-6 text-lg font-medium">
+          {isUpdate ? 'Update Trip' : 'Save New Trip'}
+        </div>
+        <div className="p-6">
           <Input
             autoFocus
             label="Trip Name"
             placeholder="Enter a name for your trip"
             value={tripName}
             onChange={(e) => setTripName(e.target.value)}
+            variant="flat"
+            labelPlacement="outside"
+            size="lg"
+            classNames={{
+              base: "max-w-full",
+              mainWrapper: "h-auto",
+              input: "text-base pt-2 h-10",
+              label: "text-sm font-medium pb-10",
+              inputWrapper: "border border-default-200 bg-default-100/50 min-h-unit-10 h-auto pt-0"
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleSave();
               }
+              // Prevent ESC key from bubbling up
+              if (e.key === 'Escape') {
+                onClose();
+                e.stopPropagation();
+              }
             }}
           />
-        </ModalBody>
-        <ModalFooter>
+        </div>
+        <div className="flex justify-end gap-2 border-t px-6 pb-6 pt-4">
           <Button variant="light" onPress={onClose}>
             Cancel
           </Button>
@@ -70,8 +100,8 @@ export const SaveTripModal: React.FC<SaveTripModalProps> = ({
           >
             {isUpdate ? 'Update' : 'Save Trip'}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </div>
+      </div>
+    </div>
   );
 };

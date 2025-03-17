@@ -6,7 +6,12 @@ import {
   ListboxItem,
   Button,
   Tabs,
-  Tab
+  Tab,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
 } from '@nextui-org/react';
 import { List, LayoutGrid, Trash2 } from 'lucide-react';
 
@@ -16,6 +21,7 @@ import { SavedTrip } from '@/types';
 import { InitialPlacesList } from './InitialPlacesList';
 import { DestinationCard } from './DestinationCard';
 import DraggableListView from './DraggableListView';
+import { SaveTripModal } from './SaveTripModal';
 
 import { Port } from '@/types';
 import { saveTripsToNeon } from '../api/savedTripsApi';
@@ -114,6 +120,7 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
               color="primary"
               size="sm"
               onPress={() => tripPanelHook.setIsSaveModalOpen(true)}
+              className="whitespace-nowrap"
             >
               Save Trip
             </Button>
