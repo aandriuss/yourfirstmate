@@ -36,7 +36,7 @@ export default function HeroLanding({ onPlanClick }: HeroLandingProps) {
     <>
       {/* Keep the fixed positioning but use a larger number of confetti pieces with variation */}
       {showConfetti && (
-        <div className="confetti-container fixed inset-0 pointer-events-none overflow-hidden z-50">
+        <div className="confetti-container pointer-events-none fixed inset-0 z-50 overflow-hidden">
           {[...Array(80)].map((_, i) => {
             // Create random offsets for each confetti piece
             const xOffset = Math.random() * 40 - 20; // Between -20px and 20px
@@ -68,18 +68,18 @@ export default function HeroLanding({ onPlanClick }: HeroLandingProps) {
       <section className="space-y-6 py-12 sm:py-20 lg:py-24">
         <div className="container flex max-w-5xl flex-col items-center gap-6 text-center">
           {/* Confetti button with updated text and gradient */}
-          <div className="min-h-10 flex items-center justify-center mb-2">
+          <div className="mb-2 flex min-h-10 items-center justify-center">
             <button
               onClick={launchConfetti}
               className={cn(
                 buttonVariants({ variant: "outline", size: "sm", rounded: "full" }),
-                "px-4 cursor-pointer"
+                "cursor-pointer px-4"
               )}
             >
               <span className="mr-3">🎉</span>
               <span>
                 Introducing the{" "}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#6366f1] to-[#a855f7] font-semibold">
+                <span className="bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text font-semibold text-transparent">
                   AI Co-Captain
                 </span>
                 {" "}for Every Sailor ⛵
@@ -88,7 +88,7 @@ export default function HeroLanding({ onPlanClick }: HeroLandingProps) {
           </div>
 
           {/* Main heading with improved leading */}
-          <h1 className="text-balance font-urban text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-[66px] leading-[1.05] max-w-4xl">
+          <h1 className="max-w-4xl text-balance font-urban text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-[66px]">
             Embark on a Stress-Free Sailing Adventure with{" "}
             <span className="text-gradient_indigo-purple font-extrabold">
               YourFirstMate
@@ -96,7 +96,7 @@ export default function HeroLanding({ onPlanClick }: HeroLandingProps) {
           </h1>
 
           {/* Description with improved leading */}
-          <p className="max-w-2xl text-balance leading-[1.6] text-muted-foreground sm:text-xl sm:leading-[1.7] mt-2 mb-4">
+          <p className="mb-4 mt-2 max-w-2xl text-balance leading-[1.6] text-muted-foreground sm:text-xl sm:leading-[1.7]">
             AI-powered assistant tailored according to your experience and
             vessel, gathers all the weather, location, maritime information and
             provides real-time actionable alerts to simplify the complexities of
@@ -104,7 +104,7 @@ export default function HeroLanding({ onPlanClick }: HeroLandingProps) {
           </p>
 
           {/* Buttons with improved spacing */}
-          <div className="flex justify-center space-x-3 md:space-x-4 mt-2">
+          <div className="mt-2 flex justify-center space-x-3 md:space-x-4">
             <button
               onClick={onPlanClick}
               className={cn(
