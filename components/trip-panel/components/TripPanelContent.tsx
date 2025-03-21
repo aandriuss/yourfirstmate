@@ -226,6 +226,7 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
                       }}
                       index={index}
                       onRemove={tripPanelHook.handleRemoveDestination}
+                      isLastDestination={index === tripPanelHook.selectedDestinations.length - 1}
                     />
                   )
                 )}
