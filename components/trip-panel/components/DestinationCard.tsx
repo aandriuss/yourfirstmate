@@ -1,18 +1,20 @@
 import React from 'react';
-import { Button, Chip, Card, Tabs, Tab } from '@nextui-org/react';
-import { Navigation, Anchor, Clock, Wind, AlertTriangle, BookOpen } from 'lucide-react';
+import { Navigation, Clock, Wind, AlertTriangle, LucideIcon, X, Compass, ArrowUpRight } from 'lucide-react';
+import { Tabs, Tab } from '@nextui-org/react';
+import Image from 'next/image';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import { SailingDestination } from '@/types';
 import { useSession } from "next-auth/react";
-import { ComfortChip } from './ComfortChip';
-import { DataCard } from "@/components/ui/cards/DataCard";
 import { NotificationCard } from "@/components/ui/cards/NotificationCard";
-import { SectionCard } from "@/components/ui/cards/SectionCard";
 import { NotificationsList } from "@/components/ui/cards/NotificationsList";
+import { WeatherDataGrid } from "@/components/ui/data-tiles/WeatherDataGrid";
+import { cn } from "@/lib/utils";
 
 // Hardcoded token - this ensures it works even if environment variables aren't loaded properly on the client
 const MAPBOX_TOKEN = "pk.eyJ1IjoidG9tYXNkcnIiLCJhIjoiY202OWNjNDRyMDZ4ejJ2cXQxNnc5ZTJ5biJ9.gZVHMIpx8dsRNFsbfuoUHw";
+
+type NotificationVariant = NonNullable<React.ComponentProps<typeof NotificationCard>['variant']>;
 
 interface DestinationCardProps {
   destination: SailingDestination;
@@ -24,6 +26,33 @@ interface DestinationCardProps {
   isLastDestination?: boolean;
 }
 
+interface NotificationItem {
+  icon: LucideIcon;
+  title: string;
+  message: string;
+  variant: NotificationVariant;
+}
+
+const ComfortChip: React.FC<{ comfort: string; getComfortColor: (comfort: string) => 'success' | 'warning' | 'danger' | 'default' }> = ({ comfort, getComfortColor }) => {
+  const colorVariants = {
+    success: 'bg-green-100 text-green-700 border-green-200',
+    warning: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    danger: 'bg-red-100 text-red-700 border-red-200',
+    default: 'bg-gray-100 text-gray-700 border-gray-200'
+  };
+
+  const colorClass = colorVariants[getComfortColor(comfort)];
+
+  return (
+    <div className={cn(
+      'px-2 py-1 rounded-full text-xs font-medium border',
+      colorClass
+    )}>
+      {comfort}
+    </div>
+  );
+};
+
 export const DestinationCard: React.FC<DestinationCardProps> = ({
   destination,
   index,
@@ -31,193 +60,198 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
   getComfortColor,
   isLastDestination = false
 }) => {
-  const validComfortLevels = ['comfortable', 'moderate', 'challenging'];
-  const comfortLevel = destination.comfortLevel.toLowerCase();
   const { data: session, status } = useSession();
-  const isAuthenticated = status === "authenticated";
-  const [placeImage, setPlaceImage] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [imageError, setImageError] = React.useState<boolean>(false);
-  const [activeTab, setActiveTab] = React.useState<'photo' | 'map'>('photo');
-  const [mapError, setMapError] = React.useState<boolean>(false);
-  
-  // State for expanded card
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'photo' | 'map'>('photo');
+  const [imageError, setImageError] = React.useState(false);
 
-  // Simple debugging to see what's coming in
-  React.useEffect(() => {
-    console.log(`Destination ${destination.destination} coordinates:`, destination.coordinates);
-  }, [destination]);
-
-  // Ensure coordinates are valid numbers with fallbacks to default values
-  const validLon = typeof destination.coordinates?.lon === 'number' 
-    ? destination.coordinates.lon
-    : typeof destination.coordinates?.lon === 'string'
-      ? parseFloat(destination.coordinates.lon)
-      : 21.1231; // Default to Athens if missing
-  
-  const validLat = typeof destination.coordinates?.lat === 'number'
-    ? destination.coordinates.lat
-    : typeof destination.coordinates?.lat === 'string'
-      ? parseFloat(destination.coordinates.lat)
-      : 55.7033; // Default value if missing
-
-  // Format to 6 decimal places which is the standard for geo coordinates
-  const sanitizedLon = isNaN(validLon) ? 21.1231 : validLon;
-  const sanitizedLat = isNaN(validLat) ? 55.7033 : validLat;
-  
-  // Create a simple, direct static map URL - stripped down for maximum compatibility
-  const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/${sanitizedLon},${sanitizedLat},10,0/400x300?access_token=${MAPBOX_TOKEN}`;
-
-  // Debug info
-  React.useEffect(() => {
-    if (activeTab === 'map') {
-      console.log(`Generated map URL for ${destination.destination}:`, staticMapUrl);
-      console.log('Using coordinates:', { lon: sanitizedLon, lat: sanitizedLat });
-    }
-  }, [activeTab, destination.destination, staticMapUrl, sanitizedLon, sanitizedLat]);
-
-  // Determine the fallback image based on destination name if possible
-  const getFallbackImage = React.useMemo(() => {
-    // Map common destinations to their fallback images
-    const fallbackMap: Record<string, string> = {
-      'Athens': '/images/mock/klaipeda.jpg',
-      'Klaipeda': '/images/mock/klaipeda.jpg',
-      'Aegina': '/images/mock/klaipeda.jpg',
-      'Hydra': '/images/mock/klaipeda.jpg',
-      'Poros': '/images/mock/klaipeda.jpg',
-      'Spetses': '/images/mock/klaipeda.jpg',
-      'Nafplio': '/images/mock/klaipeda.jpg'
-    };
-    
-    // First try exact match, then try to find a partial match
-    const destName = destination.destination || '';
-    return fallbackMap[destName] || 
-           Object.keys(fallbackMap).find(key => destName.includes(key)) ? 
-           fallbackMap[Object.keys(fallbackMap).find(key => destName.includes(key)) || ''] : 
-           '/images/mock/klaipeda.jpg';
-  }, [destination.destination]);
-
-  // Image loading effect - simplified to handle API limitations
-  React.useEffect(() => {
-    if (!isAuthenticated) return;
-    
-    // Set default state to use fallback images right away, since API credits are out
-    setIsLoading(false);
-    setImageError(true);
-  }, [destination.destination, isAuthenticated]);
-
-  // Add this helper function
-  const formatDayNumber = (idx: number) => {
-    return (idx + 1).toString();
-  };
-
-  // Simplified toggle function
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsExpanded(!isExpanded);
   };
 
-  const handleTabClick = (tab: 'photo' | 'map') => (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card expansion when clicking tabs
-    setActiveTab(tab);
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onRemove(destination.day);
   };
 
-  // Create map URL using the destination coordinates
-  const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/${
-    destination.coordinates?.lon || 21.1231
-  },${
-    destination.coordinates?.lat || 55.7033
-  },10,0/400x300?access_token=${MAPBOX_TOKEN}`;
+  const handleTabChange = (key: string | number) => {
+    setImageError(false);
+    setActiveTab(key.toString() as 'photo' | 'map');
+  };
 
-  const notifications = [
+  const getStaticMapUrl = () => {
+    const { coordinates } = destination;
+    return `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/${coordinates.lon},${coordinates.lat},12,0/400x300?access_token=${MAPBOX_TOKEN}`;
+  };
+
+  const notificationItems: NotificationItem[] = [
     {
-      icon: Wind,
-      title: "Weather Conditions",
-      message: "Expected conditions: Calm seas with light winds",
+      icon: Compass,
+      title: "AI Assessment",
+      message: "AI assessments are available with Premium. Upgrade to unlock this feature",
       variant: "blue"
     },
     {
-      icon: Navigation,
-      title: "Navigation Update",
-      message: `Distance: ${destination.distanceNM} nm, Duration: ${destination.duration}`,
-      variant: "green"
+      icon: Wind,
+      title: "Weather Update",
+      message: "Wind shift expected in 3 hours. Prepare for 15 knots from NW.",
+      variant: "amber"
+    },
+    {
+      icon: AlertTriangle,
+      title: "Vessel Alert",
+      message: "Prepare for wind. Wind increasing to 20 knots within next 30 minutes.",
+      variant: "red"
     }
   ];
 
-  // Add warning notification if conditions are challenging
-  if (destination.comfortLevel.toLowerCase().includes('challenging')) {
-    notifications.push({
-      icon: AlertTriangle,
-      title: "Safety Warning",
-      message: "Challenging conditions expected. Exercise caution.",
-      variant: "red"
+  if (destination.comfortLevel.toLowerCase() === 'challenging') {
+    notificationItems.push({
+      icon: Navigation,
+      title: "Pilot Information",
+      message: "Approach Fairway, COLREGs Rules 9 & 13 apply. Maintain radio watch on VHF Ch. 12.",
+      variant: "purple"
     });
   }
+
+  // Mock weather data - in a real app, this would come from your backend
+  const getMockWeatherData = () => ({
+    windSpeed: 6.8,
+    windDirection: 45,
+    temperature: 22,
+    waveHeight: 1.2,
+    distance: destination.distanceNM,
+    course: 140,
+    duration: destination.duration
+  });
 
   return (
     <div className="relative">
       <div 
-        className="relative bg-white rounded-lg shadow-sm mb-4 cursor-pointer hover:shadow-md transition-all"
+        className={cn(
+          "relative bg-white rounded-lg shadow-sm mb-4 cursor-pointer hover:shadow-md transition-all",
+          isExpanded && "border-2 border-transparent bg-gradient-to-r from-[#6366f1] to-[#a855f7] p-[2px]"
+        )}
         onClick={handleCardClick}
       >
-        <SectionCard
-          icon={Navigation}
-          iconColor="blue"
-          title={destination.destination}
-          description={`Day ${index + 1}`}
-        >
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4">
-            <DataCard
-              title="Distance"
-              value={destination.distanceNM}
-              unit="nm"
-              icon={Navigation}
-            />
-            <DataCard
-              title="Duration"
-              value={destination.duration}
-              icon={Clock}
-            />
-            <DataCard
-              title="Comfort"
-              value={destination.comfortLevel}
-              tag={{
-                text: destination.comfortLevel,
-                color: getComfortColor(destination.comfortLevel)
+        <div className={cn(
+          "h-full w-full bg-white rounded-lg overflow-hidden",
+          isExpanded && "relative"
+        )}>
+          {/* Header with Tabs */}
+          <div className="flex items-center justify-between px-4 pt-2">
+            <Tabs 
+              selectedKey={activeTab}
+              onSelectionChange={handleTabChange}
+              classNames={{
+                tabList: "gap-4",
+                cursor: "w-full bg-primary",
+                tab: "px-0 h-8",
+                tabContent: "group-data-[selected=true]:text-primary"
               }}
-            />
+              variant="underlined"
+              size="sm"
+            >
+              <Tab key="photo" title="Photo" />
+              <Tab key="map" title="Map" />
+            </Tabs>
+            <button 
+              onClick={handleRemove}
+              className="p-1 hover:bg-gray-100 rounded-full"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </button>
           </div>
 
-          {/* Weather Alert */}
-          <div className="mt-4 space-y-3">
-            <NotificationCard
-              icon={Wind}
-              title="Weather Conditions"
-              message="Expected conditions: Calm seas with light winds"
-              variant="blue"
-            />
-            
-            {destination.comfortLevel === 'challenging' && (
-              <NotificationCard
-                icon={AlertTriangle}
-                title="Safety Warning"
-                message="Challenging conditions expected. Exercise caution."
-                variant="red"
+          {/* Photo/Map Content */}
+          <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+            {activeTab === 'photo' ? (
+              <Image
+                src="/images/mock/klaipeda.jpg"
+                alt={destination.destination}
+                fill
+                className="object-cover"
+                onError={() => setImageError(true)}
+                priority
               />
+            ) : (
+              !imageError && (
+                <Image
+                  src={getStaticMapUrl()}
+                  alt={`Map of ${destination.destination}`}
+                  fill
+                  className="object-cover"
+                  onError={() => setImageError(true)}
+                  priority
+                />
+              )
+            )}
+            {imageError && (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                <p className="text-sm">Image not available</p>
+              </div>
             )}
           </div>
-        </SectionCard>
-      </div>
-      
-      {/* Expanded content */}
-      {isExpanded && (
-        <div className="mt-4 border-t border-gray-100 pt-4">
-          <NotificationsList notifications={notifications} />
+
+          <div className="p-4">
+            {/* Main Content */}
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="rounded-full bg-gray-900 p-3 flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                <span className="text-white text-sm">{index + 1}</span>
+              </div>
+              <div>
+                <h3 className="font-medium">{destination.destination}</h3>
+                <p className="text-sm text-muted-foreground">Day {index + 1}</p>
+              </div>
+            </div>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div>
+                <p className="text-xs text-muted-foreground">Distance</p>
+                <div className="flex items-center space-x-1">
+                  <Navigation className="h-3 w-3 text-muted-foreground" />
+                  <p className="text-sm">{destination.distanceNM} nm</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Duration</p>
+                <div className="flex items-center space-x-1">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <p className="text-sm">{destination.duration}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Comfort</p>
+                <ComfortChip 
+                  comfort={destination.comfortLevel}
+                  getComfortColor={getComfortColor}
+                />
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="text-sm text-muted-foreground mb-4">
+              {destination.safety}
+            </p>
+
+            {/* Expanded content - Weather Data and Notifications */}
+            {isExpanded && (
+              <div className="space-y-4 border-t border-gray-100 pt-4">
+                {/* Weather Data Grid */}
+                <WeatherDataGrid data={getMockWeatherData()} />
+                
+                {/* Notifications */}
+                <NotificationsList 
+                  notifications={notificationItems}
+                />
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

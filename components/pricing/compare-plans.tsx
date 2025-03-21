@@ -13,8 +13,14 @@ import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 export function ComparePlans() {
   const renderCell = (value: string | boolean | null) => {
     if (value === null) return "—";
-    if (typeof value === "boolean")
-      return value ? <CircleCheck className="mx-auto size-[22px]" /> : "—";
+
+    if (typeof value === "boolean") {
+      return value ? (
+        <div className="flex justify-center">
+          <CircleCheck className="size-[22px]" />
+        </div>
+      ) : "—";
+    }
     return value;
   };
 

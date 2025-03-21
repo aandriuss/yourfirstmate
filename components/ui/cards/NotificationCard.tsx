@@ -5,7 +5,7 @@ interface NotificationCardProps {
   title: string;
   message: string;
   icon: LucideIcon;
-  variant?: "blue" | "amber" | "purple" | "red" | "green";
+  variant?: "blue" | "amber" | "purple" | "red" | "green" | "gradient";
   className?: string;
 }
 
@@ -17,25 +17,40 @@ export function NotificationCard({
   className
 }: NotificationCardProps) {
   const variants = {
-    blue: "bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-800/20 [&>div]:bg-blue-500 [&_svg]:text-blue-600 dark:[&_svg]:text-blue-400",
-    amber: "bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-800/20 [&>div]:bg-amber-500 [&_svg]:text-amber-600 dark:[&_svg]:text-amber-400",
-    purple: "bg-purple-50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-800/20 [&>div]:bg-purple-500 [&_svg]:text-purple-600 dark:[&_svg]:text-purple-400",
-    red: "bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-800/20 [&>div]:bg-red-500 [&_svg]:text-red-600 dark:[&_svg]:text-red-400",
-    green: "bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-800/20 [&>div]:bg-green-500 [&_svg]:text-green-600 dark:[&_svg]:text-green-400",
+    blue: "bg-[#8B5CF6]/10 border border-[#8B5CF6]/20",
+    amber: "border-l-4 border-l-amber-500 bg-amber-50/50",
+    purple: "border-l-4 border-l-purple-500 bg-purple-50/50",
+    red: "border-l-4 border-l-red-500 bg-red-50/50",
+    green: "border-l-4 border-l-green-500 bg-green-50/50",
+    gradient: "border-l-4 border-l-transparent bg-white [background-image:linear-gradient(to_bottom,#6366f1,#a855f7)] [border-image:linear-gradient(to_bottom,#6366f1,#a855f7)_1]",
+  };
+
+  const titleColors = {
+    blue: "text-[#8B5CF6]",
+    amber: "text-amber-500",
+    purple: "text-purple-500",
+    red: "text-red-500",
+    green: "text-green-500",
+    gradient: "text-primary",
   };
 
   return (
     <div className={cn(
-      "p-3 rounded-lg border relative overflow-hidden",
+      "p-3 rounded-lg",
       variants[variant],
       className
     )}>
-      <div className="absolute top-0 left-0 h-full w-1" />
       <div className="flex items-start">
-        <Icon className="h-5 w-5 mr-2 flex-shrink-0" />
+        <Icon className={cn(
+          "h-4 w-4 mr-2 flex-shrink-0 mt-0.5",
+          variant === 'blue' ? "text-[#8B5CF6]" : variant === 'gradient' ? "text-primary" : "text-gray-500"
+        )} />
         <div>
-          <div className="text-sm font-medium">{title}</div>
-          <p className="text-xs text-muted-foreground">{message}</p>
+          <div className={cn("text-sm font-medium", titleColors[variant])}>{title}</div>
+          <p className={cn(
+            "text-xs",
+            variant === 'blue' ? "text-[#8B5CF6]/90" : "text-gray-500"
+          )}>{message}</p>
         </div>
       </div>
     </div>

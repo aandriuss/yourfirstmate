@@ -13,15 +13,17 @@ import {
   ModalBody,
   ModalFooter
 } from '@nextui-org/react';
-import { List, LayoutGrid, Trash2 } from 'lucide-react';
+import { List, LayoutGrid, Trash2, Navigation, Clock, Wind, ChevronDown, ChevronUp, Anchor, Ship, Compass } from 'lucide-react';
 
 import { useTripPanel } from '../hooks/useTripPanel';
 import { SavedTrip } from '@/types';
+import { cn } from "@/lib/utils";
 
 import { InitialPlacesList } from './InitialPlacesList';
 import { DestinationCard } from './DestinationCard';
 import DraggableListView from './DraggableListView';
 import { SaveTripModal } from './SaveTripModal';
+import { NotificationCard } from "@/components/ui/cards/NotificationCard";
 
 import { Port } from '@/types';
 import { saveTripsToNeon } from '../api/savedTripsApi';
@@ -38,6 +40,7 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
   portsData
 }) => {
   const { data: session } = useSession();
+  const [isSummaryExpanded, setIsSummaryExpanded] = React.useState(false);
 
   const topRatedPorts = portsData
     .filter((port) => port.top !== '')
@@ -147,6 +150,117 @@ export const TripPanelContent: React.FC<TripPanelContentProps> = ({
 
         {tripPanelHook.activeTab === 'trip' && (
           <div className="space-y-4">
+            {/* Trip Statistics Summary */}
+            {tripPanelHook.selectedDestinations.length > 0 && (
+              <div 
+                className={cn(
+                  "rounded-lg p-[1px] cursor-pointer transition-all",
+                  isSummaryExpanded 
+                    ? "border-2 border-transparent bg-gradient-to-r from-[#6366f1] to-[#a855f7]" 
+                    : "border border-gray-200"
+                )}
+                onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
+              >
+                <div className="h-full w-full bg-white rounded-lg">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-semibold">Trip Summary</h3>
+                      {isSummaryExpanded ? (
+                        <ChevronUp className="h-5 w-5 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-gray-500" />
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-sm text-gray-500">Total Distance</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Navigation className="h-4 w-4 text-primary" />
+                          <span className="text-lg font-medium">
+                            {tripPanelHook.selectedDestinations.reduce((sum, dest) => sum + Number(dest.distanceNM), 0).toFixed(1)} nm
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Estimated Duration</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Clock className="h-4 w-4 text-primary" />
+                          <span className="text-lg font-medium">
+                            {tripPanelHook.selectedDestinations.length} days
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Route Comfort</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Wind className="h-4 w-4 text-primary" />
+                          <span className="text-lg font-medium">
+                            {tripPanelHook.selectedDestinations.some(dest => dest.comfortLevel.toLowerCase() === 'challenging') 
+                              ? 'Challenging'
+                              : tripPanelHook.selectedDestinations.some(dest => dest.comfortLevel.toLowerCase() === 'moderate')
+                                ? 'Moderate'
+                                : 'Comfortable'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expanded Content */}
+                    {isSummaryExpanded && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="grid grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="font-medium mb-2">Route Details</h4>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Anchor className="h-4 w-4 text-primary" />
+                                <span className="text-sm">
+                                  {tripPanelHook.selectedDestinations.length} ports of call
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Ship className="h-4 w-4 text-primary" />
+                                <span className="text-sm">
+                                  From {tripPanelHook.selectedDestinations[0]?.destination} to {tripPanelHook.selectedDestinations[tripPanelHook.selectedDestinations.length - 1]?.destination}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="font-medium mb-2">Weather Overview</h4>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Wind className="h-4 w-4 text-primary" />
+                                <span className="text-sm">
+                                  Average wind speed: 6-8 knots
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Navigation className="h-4 w-4 text-primary" />
+                                <span className="text-sm">
+                                  Predominant wind direction: NE
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* AI Assessment Notification */}
+                        <div className="mt-4">
+                          <NotificationCard
+                            icon={Compass}
+                            title="AI Assessment"
+                            message="AI assessments are available with Premium. Upgrade to unlock this feature"
+                            variant="blue"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="relative flex items-center space-x-4">
               <Input
                 placeholder="Add more destinations..."
