@@ -11,6 +11,7 @@ import {
 } from '@nextui-org/react';
 
 import { Port } from '@/types';
+import { ComfortChip } from './ComfortChip';
 
 interface InitialPlacesListProps {
   ports: Port[];
@@ -55,17 +56,7 @@ export const InitialPlacesList: React.FC<InitialPlacesListProps> = ({
             <TableRow key={index} className="cursor-pointer">
               <TableCell>{port.port}</TableCell>
               <TableCell>
-                <Chip
-                  color={
-                    port.comfortScore === 'high'
-                      ? 'success'
-                      : port.comfortScore === 'medium'
-                        ? 'warning'
-                        : 'danger'
-                  }
-                >
-                  {port.comfortScore || 'Unknown'}
-                </Chip>
+                <ComfortChip comfort={port.comfort || 'Unknown'} />
               </TableCell>
             </TableRow>
           ))}
