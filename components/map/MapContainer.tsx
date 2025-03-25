@@ -33,7 +33,7 @@ const MapContainer = forwardRef<MapContainerHandle, MapContainerProps>(
     const mapRef = useRef<mapboxgl.Map | null>(null);
     
     const [currentStyle, setCurrentStyle] = useState(
-      'mapbox://styles/mapbox/outdoors-v12'
+      'mapbox://styles/tomasdrr/cm8etfz9z00tz01se50pycmdp'
     );
 
     useImperativeHandle(ref, () => ({
@@ -68,9 +68,9 @@ const MapContainer = forwardRef<MapContainerHandle, MapContainerProps>(
       if (!map) return;
 
       const newStyle =
-        currentStyle === 'mapbox://styles/mapbox/outdoors-v12'
+        currentStyle === 'mapbox://styles/tomasdrr/cm8etfz9z00tz01se50pycmdp'
           ? 'mapbox://styles/mapbox/satellite-streets-v12'
-          : 'mapbox://styles/mapbox/outdoors-v12';
+          : 'mapbox://styles/tomasdrr/cm8etfz9z00tz01se50pycmdp';
 
       map.setStyle(newStyle);
       setCurrentStyle(newStyle);
